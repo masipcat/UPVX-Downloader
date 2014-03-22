@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import requests, os, json, sys, re
+import requests, os, sys, re
 from urllib import urlopen
 from urlparse import urlparse
 from BeautifulSoup import BeautifulSoup
@@ -14,7 +14,7 @@ print """ _   _ ______     ___  __
  \___/|_|     \_/  /_/\_\
 
 
-Version 0.6 αlpha
+Version 0.6.1 αlpha
 Developed by Jordi Masip (jordi.masip.cat)"""
 
 # =======================================================================================================
@@ -63,15 +63,14 @@ def die(msg):
 	sys.exit(1)
 
 if plain_cookies == "":
-	print "\n[ERROR] You must set 'plain_cookies'"
-	sys.exit(1)
+	die("\n[ERROR] You must set 'plain_cookies'")
 
 plain_cookies = plain_cookies.split(";")
 cookies = {}
 for k, v in [c.split("=") for c in plain_cookies]:
 	cookies[k] = v.strip()
 
-print "\nWrite course URL (like http://cursointroduccionandroid.upvx.es/unit?unit=2)",
+print "\nType course URL (like http://cursointroduccionandroid.upvx.es/unit?unit=2)",
 while True:
 	courseURL = raw_input("\n> Course URL: ")
 
@@ -84,8 +83,11 @@ while True:
 	
 	print "\n[Getting course info...]"
 	r = requests.get(courseURL, cookies=cookies)
-	bs = BeautifulSoup(r.content)
 
+	if "google" in urlparse(r.url).netloc:
+		die("[ERROR] Cookie token expired")
+
+	bs = BeautifulSoup(r.content)
 	lesson_title = bs.findAll("h1")[0].renderContents().split("-")[0].strip()
 	if lesson_title == "":
 		die("[ERROR] This course seems it is invalid")
@@ -109,14 +111,16 @@ while True:
 				leccions[k] = {"name": v, "url": domain + a[0]["href"]}
 
 	print "\n[Searching for videos in lesson '{0}'...]".format(lesson_title)
+	
 	for name, v in leccions.items():
 		print "- {0}:".format(name),
 		r = requests.get(v["url"], cookies=cookies);
 		r.encoding = "utf-8"
 		bs = BeautifulSoup(r.content)
 		iframes = bs.findAll("iframe")
+		
 		if len(iframes) == 0:
-			print
+			print " [no video in this unit]"
 			continue
 		try:
 			yt = YouTube()
