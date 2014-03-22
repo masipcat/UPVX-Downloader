@@ -1,4 +1,4 @@
-UPVX-Downloader
+UPVX Downloader
 ===============
 
 Descarrega els vídeos dels cursos MOOC de la UPV fàcilment.
@@ -9,6 +9,7 @@ Descarrega els vídeos dels cursos MOOC de la UPV fàcilment.
 * BeautifulSoup
 * pytube (0.2.1+)
 * requests
+
 ## Com ho faig per baixar els vídeos?
 
 Copieu `upvx.py` al directori on voleu que es baixin els vídeos i un cop allà obriu el terminal i escriviu `python upvx.py` i seguiu les indicacions del programa.
